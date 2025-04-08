@@ -1,0 +1,25 @@
+.main-container {
+  height: 100vh;
+}
+
+.sidebar {
+  width: 250px;
+  transition: width 0.3s ease;
+
+  &.collapsed {
+    width: 60px;
+    overflow: hidden;
+
+    ::ng-deep .mat-list-item .nav-label {
+      display: none;
+    }
+
+    ::ng-deep .sidebar-header img.logo {
+      max-width: 40px;
+    }
+  }
+}
+
+.content-area {
+  padding: 1rem;
+}

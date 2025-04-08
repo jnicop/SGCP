@@ -1,0 +1,12 @@
+<h2 mat-dialog-title>{{ data.title || 'Mensaje' }}</h2>
+
+<mat-dialog-content>
+  <p>{{ data.message }}</p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cerrar</button>
+  <button *ngIf="data.confirm" mat-flat-button color="primary" [mat-dialog-close]="true">
+    Aceptar
+  </button>
+</mat-dialog-actions>

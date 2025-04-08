@@ -1,0 +1,34 @@
+<div class="dashboard-wrapper">
+  <h2>Bienvenido al sistema SGCP</h2>
+  <p>Resumen general de la actividad</p>
+
+  <div class="dashboard-cards">
+    <app-card-widget
+      icon="inventory_2"
+      title="Productos"
+      [value]="125"
+      color="primary">
+    </app-card-widget>
+
+    <app-card-widget
+      icon="warning"
+      title="Stock Bajo"
+      [value]="12"
+      color="warn">
+    </app-card-widget>
+
+    <app-card-widget
+      icon="group"
+      title="Usuarios"
+      [value]="5"
+      color="accent">
+    </app-card-widget>
+
+    <app-card-widget
+      icon="attach_money"
+      title="Ventas"
+      [value]="'$98.750'"
+      color="success">
+    </app-card-widget>
+  </div>
+</div>

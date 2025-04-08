@@ -1,0 +1,14 @@
+<div class="no-results-container">
+    <mat-icon>info</mat-icon>
+    <div class="message">{{ message }}</div>
+  
+    <button
+      *ngIf="showButton"
+      mat-raised-button
+      color="primary"
+      (click)="onClick()"
+    >
+      {{ buttonText }}
+    </button>
+  </div>
+  

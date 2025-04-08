@@ -1,0 +1,26 @@
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+
+  .logo {
+    max-height: 40px;
+    transition: max-width 0.3s ease;
+  }
+
+  button {
+    margin-left: auto;
+  }
+}
+
+.nav-label {
+  margin-left: 8px;
+  transition: opacity 0.3s ease;
+
+  &.hidden {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+  }
+}

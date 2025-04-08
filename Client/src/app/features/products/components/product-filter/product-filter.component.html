@@ -1,0 +1,25 @@
+<!-- <mat-form-field appearance="outline" style="width: 100%;">
+    <mat-label>Buscar producto</mat-label>
+    <input matInput [(ngModel)]="searchTerm" (keyup.enter)="onSearch()" placeholder="Nombre o descripción">
+    <button mat-button  matSuffix  aria-label (click)="onSearch()">
+        <mat-icon>search</mat-icon>
+        Buscar
+      </button>
+      
+  </mat-form-field>
+    -->
+  <div class="filter-container">
+    <mat-form-field appearance="outline" class="filter-input">
+      <mat-label>Buscar producto</mat-label>
+      <input
+        matInput
+        [(ngModel)]="filterText"
+        (input)="onInputChange()"
+        placeholder="Nombre del producto" />
+      <button mat-button matSuffix aria-label *ngIf="filterText"   (click)="clear()">
+        <mat-icon>close</mat-icon>
+        Clear
+      </button>
+    </mat-form-field>
+  </div>
+  

@@ -1,0 +1,22 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+    height: 64px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  
+    .logo {
+      font-size: 20px;
+      font-weight: bold;
+    }
+  
+    .spacer {
+      flex: 1;
+    }
+  
+    .username {
+      margin-right: 10px;
+      font-weight: 500;
+    }
+  }
+  

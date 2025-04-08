@@ -1,0 +1,17 @@
+<mat-toolbar color="primary" class="navbar">
+  <button mat-icon-button (click)="onToggleSidebar()">
+    <mat-icon>menu</mat-icon>
+  </button>
+
+  <span class="logo">SGCP</span>
+  <span class="spacer"></span>
+
+  <span class="username">Hola, {{ username }}</span>
+  <button mat-icon-button [matMenuTriggerFor]="menu">
+    <mat-icon>account_circle</mat-icon>
+  </button>
+  <mat-menu #menu="matMenu">
+    <button mat-menu-item routerLink="/change-password">Cambiar contraseña</button>
+    <button mat-menu-item (click)="logout()">Cerrar sesión</button>
+  </mat-menu>
+</mat-toolbar>

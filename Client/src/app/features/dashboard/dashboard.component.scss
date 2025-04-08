@@ -1,0 +1,20 @@
+.dashboard-wrapper {
+  padding: 40px 20px;
+  text-align: center;
+
+  h2 {
+    margin-bottom: 4px;
+  }
+
+  p {
+    color: #888;
+    margin-bottom: 30px;
+  }
+}
+
+.dashboard-cards {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 32px;
+}

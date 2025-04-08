@@ -1,0 +1,166 @@
+<div class="builder-wrapper">
+  <h2 class="title">{{ isEditMode ? 'Editar producto' : 'Crear nuevo producto' }}</h2>
+
+  <form [formGroup]="builderForm" class="builder-form">
+    
+    <!-- Paso 1: Datos del producto -->
+    <div *ngIf="step === 1" class="step">
+      <h3>Paso 1: Datos del producto</h3>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Nombre *</mat-label>
+        <input matInput formControlName="name" type="text" required />
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Descripción</mat-label>
+        <textarea matInput formControlName="description"></textarea>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Categoría *</mat-label>
+        <mat-select formControlName="categoryId">
+          <mat-option [value]="null" disabled>Seleccionar categoría</mat-option>
+          <mat-option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <div class="actions">
+        <button mat-stroked-button color="warn" type="button" routerLink="/products">
+          <mat-icon>cancel</mat-icon> Cancelar
+        </button>
+        <button mat-raised-button color="primary" type="button" (click)="nextStep()">Siguiente</button>
+      </div>
+    </div>
+
+    <!-- Paso 2: Componentes -->
+    <div *ngIf="step === 2" class="step">
+      <h3>Paso 2: Componentes</h3>
+
+      <div class="inline-form" [formGroup]="componentForm">
+        <mat-form-field appearance="fill">
+          <mat-label>Componente</mat-label>
+          <mat-select formControlName="componentId">
+            <mat-option [value]="null" disabled>Seleccionar componente</mat-option>
+            <mat-option *ngFor="let comp of availableComponents" [value]="comp.id">{{ comp.name }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Cantidad</mat-label>
+          <input matInput type="number" formControlName="quantity" />
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" type="button" (click)="addComponent()">
+          <mat-icon>add</mat-icon> Agregar
+        </button>
+      </div>
+
+      <div formArrayName="components">
+        <mat-list>
+          <mat-list-item *ngFor="let comp of components.controls; let i = index" [formGroupName]="i">
+            <div class="item-content">
+              <span>{{ comp.get('componentName')?.value }} - {{ comp.get('quantity')?.value }}</span>
+              <button mat-icon-button color="warn" (click)="removeComponent(i)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </mat-list-item>
+        </mat-list>
+      </div>
+
+      <div class="actions">
+        <button mat-stroked-button color="warn" type="button" (click)="prevStep()">Volver</button>
+        <button mat-raised-button color="primary" type="button" (click)="nextStep()">Siguiente</button>
+      </div>
+    </div>
+
+    <!-- Paso 3: Mano de Obra -->
+    <div *ngIf="step === 3" class="step">
+      <h3>Paso 3: Mano de obra</h3>
+
+      <div class="inline-form" [formGroup]="laborForm">
+        <mat-form-field appearance="fill">
+          <mat-label>Tipo</mat-label>
+          <mat-select formControlName="laborTypeId">
+            <mat-option [value]="null" disabled>Seleccionar tipo</mat-option>
+            <mat-option *ngFor="let type of laborTypes" [value]="type.id">{{ type.name }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Horas</mat-label>
+          <input matInput type="number" formControlName="hours" />
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" type="button" (click)="addLaborCost()">
+          <mat-icon>add</mat-icon> Agregar
+        </button>
+      </div>
+
+      <div formArrayName="laborCosts">
+        <mat-list>
+          <mat-list-item *ngFor="let labor of laborCosts.controls; let i = index" [formGroupName]="i">
+            <div class="item-content">
+              <span>{{ labor.get('laborTypeName')?.value }} - {{ labor.get('hours')?.value }} h</span>
+              <button mat-icon-button color="warn" (click)="removeLaborCost(i)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </mat-list-item>
+        </mat-list>
+      </div>
+
+      <div class="actions">
+        <button mat-stroked-button color="warn" type="button" (click)="prevStep()">Volver</button>
+        <button mat-raised-button color="primary" type="button" (click)="nextStep()">Siguiente</button>
+      </div>
+    </div>
+
+    <!-- Paso 4: Resumen -->
+    <div *ngIf="step === 4" class="step">
+      <h3>Paso 4: Resumen</h3>
+
+      <mat-card class="summary-card">
+        <mat-card-title>Datos del producto</mat-card-title>
+        <mat-divider></mat-divider>
+        <mat-card-content>
+          <p><strong>Nombre:</strong> {{ builderForm.value.name }}</p>
+          <p><strong>Descripción:</strong> {{ builderForm.value.description }}</p>
+          <p><strong>Categoría:</strong> {{ getCategoryName(builderForm.value.categoryId) }}</p>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="summary-card">
+        <mat-card-title>Componentes</mat-card-title>
+        <mat-divider></mat-divider>
+        <mat-card-content>
+          <mat-list>
+            <mat-list-item *ngFor="let comp of components.controls">
+              {{ comp.get('componentName')?.value }} - {{ comp.get('quantity')?.value }}
+            </mat-list-item>
+          </mat-list>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="summary-card">
+        <mat-card-title>Mano de obra</mat-card-title>
+        <mat-divider></mat-divider>
+        <mat-card-content>
+          <mat-list>
+            <mat-list-item *ngFor="let labor of laborCosts.controls">
+              {{ labor.get('laborTypeName')?.value }} - {{ labor.get('hours')?.value }} h
+            </mat-list-item>
+          </mat-list>
+        </mat-card-content>
+      </mat-card>
+
+      <div class="actions">
+        <button mat-stroked-button color="warn" type="button" (click)="prevStep()">Volver</button>
+        <button mat-raised-button color="primary" type="button" (click)="submitProduct()"  [disabled]="isSaving">
+          <mat-icon>check</mat-icon> Confirmar y guardar
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
