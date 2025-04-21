@@ -1,0 +1,15 @@
+<div class="filter-container">
+    <mat-form-field appearance="outline" class="filter-input">
+      <mat-label>Buscar producto</mat-label>
+      <input
+        matInput
+        [(ngModel)]="filterText"
+        (input)="onInputChange()"
+        placeholder="Nombre del producto" />
+      <button mat-button matSuffix aria-label *ngIf="filterText"   (click)="clear()">
+        <mat-icon>close</mat-icon>
+        Clear
+      </button>
+    </mat-form-field>
+  </div>
+  

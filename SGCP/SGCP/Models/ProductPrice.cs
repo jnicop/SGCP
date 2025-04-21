@@ -29,5 +29,11 @@ public partial class ProductPrice
 
     public bool Enable { get; set; }
 
+    public decimal? PackagingCost { get; set; }
+
+    public decimal? FixedCosts { get; set; }
+
+    public decimal? LaborCost { get; set; }
+
     public virtual Product Product { get; set; } = null!;
 }

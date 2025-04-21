@@ -22,6 +22,12 @@ namespace SGCP.Services
             return _mapper.Map<IEnumerable<CategoryDto>>(categories);
         }
 
+        public async Task<IEnumerable<CategoryDto>> GetByTypeAsync(int type)
+        {
+            var categories = await _context.Categories.Where(c => c.Enable == true && c.CategoryTypeId == type).ToListAsync();
+            return _mapper.Map<IEnumerable<CategoryDto>>(categories);
+        }
+
         public async Task<CategoryDto> GetByIdAsync(long id)
         {
             var category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == id && c.Enable == true);
@@ -68,6 +74,6 @@ namespace SGCP.Services
             await _context.SaveChangesAsync();
             return true;
         }
-    
+
     }
 }

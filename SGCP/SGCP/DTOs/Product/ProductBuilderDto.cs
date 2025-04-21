@@ -9,6 +9,11 @@ namespace SGCP.DTOs.Product
         public string Name { get; set; }
         public string Description { get; set; }
         public int CategoryId { get; set; }
+        public string? Presentation { get; set; }
+
+        public decimal? TotalLength { get; set; }
+
+        public long? UnitId { get; set; }
         public List<ProductComponentDto> Components { get; set; } = new();
         public List<LaborCostDto> LaborCosts { get; set; } = new();
     }

@@ -1,6 +1,6 @@
 ﻿namespace SGCP.DTOs.Component
 {
-    public class ComponentUpdateDto
+    public class ComponentUpdateDto: ComponentCreateDto
     {
         public string Name { get; set; }
         public string Type { get; set; }

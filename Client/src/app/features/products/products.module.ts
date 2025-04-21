@@ -1,12 +1,11 @@
 import { CommonModule } from "@angular/common";
-import { ProductListComponent } from "../products/components/product-list/product-list.component";
+import { ProductListComponent } from "./product-list/product-list.component";
 import { FormsModule } from "@angular/forms";
 import { SharedModule } from "shared/shared.module";
 import { RouterModule, Routes } from "@angular/router";
 import { NgModule } from "@angular/core";
-import { ProductFilterComponent } from './components/product-filter/product-filter.component';
-import { ProductFormComponent } from './components/product-form/product-form.component';
-import { ProductBuilderComponent } from './components/product-builder/product-builder.component';
+import { ProductFilterComponent } from './product-filter/product-filter.component';
+import { ProductBuilderComponent } from './product-builder/product-builder.component';
 
 const routes: Routes = [
     { path: '', component: ProductListComponent },
@@ -15,7 +14,7 @@ const routes: Routes = [
   ];
   
 @NgModule({
-    declarations: [ProductListComponent, ProductFilterComponent, ProductFormComponent, ProductBuilderComponent],
+    declarations: [ProductListComponent, ProductFilterComponent, ProductBuilderComponent],
     imports: [
     CommonModule,
     FormsModule,

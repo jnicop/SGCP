@@ -1,26 +1,33 @@
 // ✅ Archivo: product-builder.component.ts (versión final 100% funcional)
 
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormArray, Validators, FormControl } from '@angular/forms';
 import { CategoryDto } from 'app/models/category.model';
 import { CategoryService } from 'app/services/category.service';
-import { ComponentDto } from 'app/models/component.model';
+import { ComponentDto } from 'features/components/models/component.dto';
 import { LaborTypeDto } from 'app/models/labor-type.model';
 import { LaborTypeService } from 'app/services/labor-type.service';
 import { ComponentService } from 'app/services/component.service';
 import { ProductService } from '../services/product.service';
+import { CurrencyConfigService } from 'shared/service/currency-config.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ChangeDetectorRef } from '@angular/core';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
 import { DialogService } from 'shared/service/dialog.service';
 import { ProductBuilderDto } from '../models/product-builder.model';
 import { SnackbarService } from 'shared/snackbar.service';
+import { AuxCatTypeService } from 'shared/service/auxCat.service';
+import { UnitDto } from 'core/dtos/unit.dto';
+import { CustomCurrencyPipe } from 'shared/service/pipes/custom-currency.pipe';
+import { createObjectFilterObservable, displayWithFn } from 'shared/utils/autocomplete.utils';
+
 
 @Component({
   selector: 'app-product-builder',
   templateUrl: './product-builder.component.html',
   styleUrls: ['./product-builder.component.scss'],
-  standalone: false
+  standalone: false,
+  providers: [CustomCurrencyPipe]
 })
 export class ProductBuilderComponent implements OnInit {
   builderForm!: FormGroup;
@@ -33,9 +40,12 @@ export class ProductBuilderComponent implements OnInit {
   isSaving = false;
 
   categories: CategoryDto[] = [];
+  categoryControl = new FormControl<CategoryDto | string>('');
+  filteredCategories!: Observable<CategoryDto[]>;
+
   availableComponents: ComponentDto[] = [];
   laborTypes: LaborTypeDto[] = [];
-
+ unitTypes: UnitDto[] = [];
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
@@ -43,6 +53,8 @@ export class ProductBuilderComponent implements OnInit {
     private componentService: ComponentService,
     private laborTypeService: LaborTypeService,
     private productService: ProductService,
+    private customCurrencyPipe: CustomCurrencyPipe,
+    private auxCatService: AuxCatTypeService,
     private cdRef: ChangeDetectorRef,
     private dialogService:DialogService,
     private snackbar: SnackbarService,
@@ -62,22 +74,37 @@ export class ProductBuilderComponent implements OnInit {
       hours: [null, [Validators.required, Validators.min(0.1)]]
     });
 
+    
     forkJoin({
-      categories: this.categoryService.getAll(),
+      categories: this.categoryService.getAllByType(1),
       components: this.componentService.getAll(),
-      laborTypes: this.laborTypeService.getAll()
-    }).subscribe(({ categories, components, laborTypes }) => {
+      laborTypes: this.laborTypeService.getAll(),
+      unitTypes: this.auxCatService.getUnitType(),
+    }).subscribe(({ categories, components, laborTypes,unitTypes }) => {
       this.categories = categories;
       this.availableComponents = components;
       this.laborTypes = laborTypes;
-
+      this.unitTypes = unitTypes;
       const id = this.route.snapshot.paramMap.get('id');
+
       if (id) {
         this.productId = +id;
         this.isEditMode = true;
         this.loadProduct(this.productId);
       }
+
+      if (!this.isEditMode) {
+        this.categoryControl.setValue(''); // fuerza la emisión y muestra todas las categorías
+      }
+
+      this.filteredCategories = createObjectFilterObservable<CategoryDto>(
+        this.categoryControl,
+        this.categories,
+        cat => cat.name
+      );
     });
+
+
   }
 
   initForm() {
@@ -88,6 +115,12 @@ export class ProductBuilderComponent implements OnInit {
       components: this.fb.array([]),
       laborCosts: this.fb.array([])
     });
+  }
+
+  displayCategory = displayWithFn<CategoryDto>(c => c.name);
+
+  selectCategory(category: CategoryDto): void {
+    this.builderForm.get('categoryId')?.setValue(category.id);
   }
 
   get components(): FormArray {
@@ -118,11 +151,17 @@ export class ProductBuilderComponent implements OnInit {
       c => c.get('componentId')?.value === componentId
     );
     if (alreadyExists) return;
+  
+    const unit = this.unitTypes.find(u => u.id === component.unitId);
+    const unitLabel = unit ? unit.symbol || unit.name : 'unidad';
 
     this.components.push(this.fb.group({
       componentId: [componentId, Validators.required],
       componentName: [component.name],
-      quantity: [quantity, [Validators.required, Validators.min(0.01)]]
+      quantity: [quantity, [Validators.required, Validators.min(0.01)]],
+      unitId: [component.unitId ?? null],
+      unit:unitLabel,
+      enable: [true]
     }));
 
     this.componentForm.reset();
@@ -145,10 +184,16 @@ export class ProductBuilderComponent implements OnInit {
     );
     if (alreadyExists) return;
 
+    const unit = this.unitTypes.find(u => u.id === labor.unitId);
+    const unitLabel = unit ? unit.symbol || unit.name : 'h';
+    
     this.laborCosts.push(this.fb.group({
       laborTypeId: [laborTypeId, Validators.required],
       laborTypeName: [labor.name],
-      hours: [hours, [Validators.required, Validators.min(0.1)]]
+      quantity: [hours, [Validators.required, Validators.min(0.1)]], // 👈 usamos `quantity` en lugar de `hours`
+      unitId: [labor.unitId ?? null],
+      unit: unitLabel,
+      enable: [true]
     }));
 
     this.laborForm.reset();
@@ -164,7 +209,49 @@ export class ProductBuilderComponent implements OnInit {
     return cat ? cat.name : 'Desconocida';
   }
 
+  getComponentUnitAndCost(componentId: number): string {
+    const component = this.availableComponents.find(c => c.id === componentId);
+    if (!component) return '';
+  
+    const unit = this.unitTypes.find(u => u.id === component.unitId);
+    const unitLabel = unit ? unit.symbol || unit.name : 'unidad';
+    return `${this.customCurrencyPipe.transform(component.unitCost)} / ${unitLabel}`;
+  }
+  
+  getComponentTotalLineCost(componentId: number, quantity: number): string {
+    const component = this.availableComponents.find(c => c.id === componentId);
+    if (!component) return '';
+  
+    const total = component.unitCost * quantity;
+    return `${this.customCurrencyPipe.transform(total)}`;
+  }
  
+  get summaryComponents(): any[] {
+    return this.components.controls.map(ctrl => ({
+      componentName: ctrl.get('componentName')?.value,
+      quantity: ctrl.get('quantity')?.value,
+      unit: ctrl.get('unit')?.value,
+      componentId: ctrl.get('componentId')?.value,
+    }));
+  }
+  
+  get summaryLabor(): any[] {
+    return this.laborCosts.controls.map(ctrl => ({
+      laborTypeName: ctrl.get('laborTypeName')?.value,
+      quantity: ctrl.get('quantity')?.value,
+      laborTypeId: ctrl.get('laborTypeId')?.value
+    }));
+  }
+  
+  getLaborLineCostDetail(laborTypeId: number, quantity: number): string {
+    const labor = this.laborTypes.find(l => l.id === laborTypeId);
+    if (!labor) return '';
+    const unitCost = labor.hourlyCost;
+    const total = unitCost * quantity;
+  
+    return `${this.customCurrencyPipe.transform(total)} (${this.customCurrencyPipe.transform(unitCost)}/h)`;
+
+  }
   // submitProduct() {
   //   if (this.builderForm.invalid) {
   //     this.dialogService.alert('Faltan datos obligatorios', 'Por favor completá todos los campos requeridos.');
@@ -263,15 +350,23 @@ export class ProductBuilderComponent implements OnInit {
         description: product.description,
         categoryId: product.categoryId
       });
-  
+      const categoria = this.categories.find(c => c.id === product.categoryId);
+      if (categoria) {
+        this.categoryControl.setValue(categoria); //  esto muestra el nombre en el combo
+      }
+        
       // COMPONENTES
       const compFormArray: FormArray = this.fb.array([]);
       product.components.forEach(c => {
         const comp = this.availableComponents.find(ac => ac.id === c.componentId);
+        const unit = this.unitTypes.find(u => u.id === c.unitId);
+        const unitLabel = unit ? unit.symbol || unit.name : 'unidad';
+        
         compFormArray.push(this.fb.group({
           componentId: [c.componentId, Validators.required],
           componentName: [comp?.name ?? 'Desconocido'],
           quantity: [c.quantity, [Validators.required, Validators.min(0.01)]],
+          unit: unitLabel,
           unitId: [c.unitId, Validators.required],
           enable: [c.enable]
         }));
@@ -296,6 +391,46 @@ export class ProductBuilderComponent implements OnInit {
     });
   }
   
+  formatCurrencyARS(value: number): string {
+    return new Intl.NumberFormat(
+    ).format(value);
+  }
+  
+  get componentTotalCost(): number {
+    return this.components.controls.reduce((acc, ctrl) => {
+      const componentId = ctrl.get('componentId')?.value;
+      const quantity = +ctrl.get('quantity')?.value || 0;
+      const component = this.availableComponents.find(c => c.id === componentId);
+      const unitCost = component?.unitCost ?? 0;
+      return acc + (quantity * unitCost);
+    }, 0);
+  }
+  
+  get laborTotalCost(): number {
+    return this.laborCosts.controls.reduce((acc, ctrl) => {
+      const laborTypeId = ctrl.get('laborTypeId')?.value;
+      const quantity = +ctrl.get('hours')?.value || +ctrl.get('quantity')?.value || 0;
+      const labor = this.laborTypes.find(l => l.id === laborTypeId);
+      const hourlyCost = labor?.hourlyCost ?? 0;
+      return acc + (quantity * hourlyCost);
+    }, 0);
+  }
+  
+  get productTotalCost(): number {
+    return this.componentTotalCost + this.laborTotalCost;
+  }
+
+  getUnitCost(componentId: number): string {
+    const component = this.availableComponents.find(c => c.id === componentId);
+    if (!component) return '';
+    return `${this.customCurrencyPipe.transform( component.unitCost)}`;
+  }
+  
+  getHourlyCost(laborTypeId: number): string {
+    const labor = this.laborTypes.find(l => l.id === laborTypeId);
+    if (!labor) return '';
+    return `${this.customCurrencyPipe.transform( labor.hourlyCost)}`;
+  }
   
   // loadProduct(id: number) {
   //   this.productService.getById(id).subscribe(product => {

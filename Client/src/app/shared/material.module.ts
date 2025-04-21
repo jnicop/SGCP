@@ -19,6 +19,10 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 
 @NgModule({
   exports: [
@@ -40,7 +44,10 @@ import { MatSelectModule } from '@angular/material/select';
     ReactiveFormsModule,
     MatDialogModule,
     MatSelectModule,
-
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatRadioModule,
+    MatAutocompleteModule
   ]
 })
 export class MaterialModule {}

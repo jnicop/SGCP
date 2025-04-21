@@ -9,6 +9,7 @@ namespace SGCP.Mappings
         public LaborTypesProfile()
         {
             CreateMap<LaborType, LaborTypeDto>().ReverseMap();
+
         }
     }
 }

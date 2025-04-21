@@ -1,0 +1,201 @@
+.builder-wrapper {
+    max-width: 960px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  .title {
+    text-align: center;
+    font-size: 26px;
+    margin-bottom: 2rem;
+  }
+  
+  .builder-form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  .step {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .inline-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 1rem;
+  
+    mat-form-field {
+      flex: 1 1 250px;
+    }
+  
+    button {
+      margin-top: 8px;
+      height: 40px;
+    }
+  }
+  
+  mat-card {
+    margin-bottom: 1.5rem;
+  
+    mat-card-title {
+      font-weight: 600;
+      font-size: 18px;
+      margin-bottom: 0.5rem;
+    }
+  
+    mat-card-content {
+      p {
+        margin: 0.25rem 0;
+      }
+    }
+  }
+  
+  .item-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+    gap: 1rem;
+  
+    button {
+      min-width: 140px;
+    }
+  }
+  // .inline-form {
+  //   display: flex;
+  //   flex-wrap: wrap;
+  //   align-items: flex-end;
+  //   gap: 1rem;
+  //   margin-bottom: 1rem;
+  
+  //   mat-form-field {
+  //     flex: 1 1 200px;
+  //   }
+  // }
+  
+  .item-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 8px 0;
+    font-size: 15px;
+  }
+  .inline-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  
+    mat-form-field {
+      flex: 1 1 180px;
+    }
+  
+    button {
+      height: 40px;
+      margin-top: 8px;
+      white-space: nowrap;
+    }
+  }
+  .add-btn {
+    height: 56px;
+    align-self: flex-end;
+    border-radius: 8px;
+    font-weight: 600;
+  
+    .icon-left {
+      margin-right: 6px;
+    }
+  }
+
+/* Tamaños reducidos para campos numéricos */
+.small-field {
+  flex: 1 1 120px !important; // más chico que el resto
+  min-width: 100px;
+}
+
+/* Ajustes extra para botón agregar */
+.inline-form button {
+  align-self: flex-end;
+  height: 56px;
+  // margin-top: 0;
+  margin: inherit;
+}
+
+/* Alineación general de formularios en línea */
+.inline-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-bottom: 1rem;
+
+  mat-form-field {
+    flex: 1 1 180px;
+  }
+
+  .small-field {
+    flex: 1 1 120px !important;
+    min-width: 100px;
+  }
+
+  button {
+    height: 56px;
+    margin-top: 0;
+    white-space: nowrap;
+  }
+}
+
+/* Botón de agregar estilizado */
+.add-btn {
+  height: 56px;
+  align-self: flex-end;
+  border-radius: 8px;
+  font-weight: 600;
+
+  .icon-left {
+    margin-right: 6px;
+  }
+}
+
+/* Tarjeta de resumen */
+mat-card {
+  margin-bottom: 1.5rem;
+
+  mat-card-title {
+    font-weight: 600;
+    font-size: 18px;
+    margin-bottom: 0.5rem;
+  }
+
+  mat-card-content {
+    p {
+      margin: 0.25rem 0;
+    }
+  }
+
+  mat-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
+// mat-form-field {
+//   width: 100%;
+//   max-width: 400px;
+// }

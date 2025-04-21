@@ -28,7 +28,13 @@ namespace SGCP.Mappings
                 .ForMember(dest => dest.ProductComponents, opt => opt.Ignore())
                 .ForMember(dest => dest.RegionalsPrices, opt => opt.Ignore())
                 .ForMember(dest => dest.CategoryId, opt => opt.MapFrom(src => src.CategoryId))
-                .ForMember(dest => dest.ProductPrice, opt => opt.Ignore());
+                .ForMember(dest => dest.ProductPrice, opt => opt.Ignore())
+                    .ForMember(dest => dest.Presentation, opt => opt.Ignore())
+    .ForMember(dest => dest.TotalLength, opt => opt.Ignore())
+    .ForMember(dest => dest.UnitId, opt => opt.Ignore())
+    .ForMember(dest => dest.ProductFixedCosts, opt => opt.Ignore())
+    .ForMember(dest => dest.ProductPackagings, opt => opt.Ignore())
+    .ForMember(dest => dest.Unit, opt => opt.Ignore());
 
             // UpdateDto -> Modelo
             CreateMap<ProductUpdateDto, Product>()
@@ -44,7 +50,13 @@ namespace SGCP.Mappings
                 .ForMember(dest => dest.ProductComponents, opt => opt.Ignore())
                 .ForMember(dest => dest.RegionalsPrices, opt => opt.Ignore())
                 .ForMember(dest => dest.CategoryId, opt => opt.MapFrom(src => src.CategoryId))
-                .ForMember(dest => dest.ProductPrice, opt => opt.Ignore());
+                .ForMember(dest => dest.ProductPrice, opt => opt.Ignore())
+                    .ForMember(dest => dest.Presentation, opt => opt.Ignore())
+    .ForMember(dest => dest.TotalLength, opt => opt.Ignore())
+    .ForMember(dest => dest.UnitId, opt => opt.Ignore())
+    .ForMember(dest => dest.ProductFixedCosts, opt => opt.Ignore())
+    .ForMember(dest => dest.ProductPackagings, opt => opt.Ignore())
+    .ForMember(dest => dest.Unit, opt => opt.Ignore());
         }
     }
 }

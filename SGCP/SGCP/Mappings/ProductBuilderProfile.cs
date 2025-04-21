@@ -23,7 +23,13 @@ namespace SGCP.Mappings
                   .ForMember(dest => dest.UserInsert, opt => opt.Ignore())
                   .ForMember(dest => dest.UserUpdate, opt => opt.Ignore())
                   .ForMember(dest => dest.Enable, opt => opt.Ignore())
-                    .ForMember(dest => dest.ProductPrice, opt => opt.Ignore());
+                    .ForMember(dest => dest.ProductPrice, opt => opt.Ignore())
+                        .ForMember(dest => dest.Presentation, opt => opt.MapFrom(src => src.Presentation))
+    .ForMember(dest => dest.TotalLength, opt => opt.MapFrom(src => src.TotalLength))
+    .ForMember(dest => dest.UnitId, opt => opt.MapFrom(src => src.UnitId))
+    .ForMember(dest => dest.ProductFixedCosts, opt => opt.Ignore())
+    .ForMember(dest => dest.ProductPackagings, opt => opt.Ignore())
+    .ForMember(dest => dest.Unit, opt => opt.Ignore());
 
             // Mapear entidad a DTO
             //CreateMap<Product, ProductBuilderDto>()

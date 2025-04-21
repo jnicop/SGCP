@@ -23,7 +23,7 @@
     <!-- Precio -->
     <ng-container matColumnDef="finalPrice">
       <th mat-header-cell *matHeaderCellDef> Precio Final </th>
-      <td mat-cell *matCellDef="let product"> {{ product.finalPrice | currency }} </td>
+      <td mat-cell *matCellDef="let product"> {{ product.finalPrice | customCurrency  }} </td>
     </ng-container>
 
     <!-- Categoría -->

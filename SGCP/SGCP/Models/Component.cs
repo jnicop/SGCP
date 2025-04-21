@@ -29,9 +29,25 @@ public partial class Component
 
     public long? CategoryId { get; set; }
 
+    public int? ComponentTypeId { get; set; }
+
+    public string? Code { get; set; }
+
     public virtual Category? Category { get; set; }
 
+    public virtual ICollection<ComponentAttribute> ComponentAttributes { get; set; } = new List<ComponentAttribute>();
+
+    public virtual ICollection<ComponentPresentation> ComponentPresentations { get; set; } = new List<ComponentPresentation>();
+
+    public virtual ICollection<ComponentProcess> ComponentProcesses { get; set; } = new List<ComponentProcess>();
+
+    public virtual ICollection<ComponentTreatment> ComponentTreatments { get; set; } = new List<ComponentTreatment>();
+
+    public virtual ComponentType? ComponentType { get; set; }
+
     public virtual ICollection<ProductComponent> ProductComponents { get; set; } = new List<ProductComponent>();
+
+    public virtual ICollection<ProductPackaging> ProductPackagings { get; set; } = new List<ProductPackaging>();
 
     public virtual Unit Unit { get; set; } = null!;
 }

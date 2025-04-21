@@ -17,7 +17,19 @@ public partial class SGCP_DbContext : DbContext
 
     public virtual DbSet<Category> Categories { get; set; }
 
+    public virtual DbSet<CategoryType> CategoryTypes { get; set; }
+
     public virtual DbSet<Component> Components { get; set; }
+
+    public virtual DbSet<ComponentAttribute> ComponentAttributes { get; set; }
+
+    public virtual DbSet<ComponentPresentation> ComponentPresentations { get; set; }
+
+    public virtual DbSet<ComponentProcess> ComponentProcesses { get; set; }
+
+    public virtual DbSet<ComponentTreatment> ComponentTreatments { get; set; }
+
+    public virtual DbSet<ComponentType> ComponentTypes { get; set; }
 
     public virtual DbSet<Currency> Currencies { get; set; }
 
@@ -33,9 +45,15 @@ public partial class SGCP_DbContext : DbContext
 
     public virtual DbSet<Permission> Permissions { get; set; }
 
+    public virtual DbSet<ProcessType> ProcessTypes { get; set; }
+
     public virtual DbSet<Product> Products { get; set; }
 
     public virtual DbSet<ProductComponent> ProductComponents { get; set; }
+
+    public virtual DbSet<ProductFixedCost> ProductFixedCosts { get; set; }
+
+    public virtual DbSet<ProductPackaging> ProductPackagings { get; set; }
 
     public virtual DbSet<ProductPrice> ProductPrices { get; set; }
 
@@ -48,6 +66,10 @@ public partial class SGCP_DbContext : DbContext
     public virtual DbSet<Role> Roles { get; set; }
 
     public virtual DbSet<RolePermission> RolePermissions { get; set; }
+
+    public virtual DbSet<ScopeType> ScopeTypes { get; set; }
+
+    public virtual DbSet<TreatmentType> TreatmentTypes { get; set; }
 
     public virtual DbSet<Unit> Units { get; set; }
 
@@ -67,17 +89,30 @@ public partial class SGCP_DbContext : DbContext
 
             entity.ToTable("Categories", "Cat");
 
-            entity.HasIndex(e => e.Type, "IX_Categories_Type");
+            entity.HasIndex(e => e.CategoryTypeId, "IX_Categories_CategoryTypeId");
 
             entity.Property(e => e.Enable).HasDefaultValue(true);
             entity.Property(e => e.InsertDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.Name).HasMaxLength(255);
-            entity.Property(e => e.Type).HasMaxLength(50);
             entity.Property(e => e.UpdateDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
+
+            entity.HasOne(d => d.CategoryType).WithMany(p => p.Categories)
+                .HasForeignKey(d => d.CategoryTypeId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Categories_CategoryTypes");
+        });
+
+        modelBuilder.Entity<CategoryType>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Category__3214EC07F8E4DF88");
+
+            entity.ToTable("CategoryTypes", "Cat");
+
+            entity.Property(e => e.Name).HasMaxLength(50);
         });
 
         modelBuilder.Entity<Component>(entity =>
@@ -86,6 +121,7 @@ public partial class SGCP_DbContext : DbContext
 
             entity.ToTable("Components", "Prod");
 
+            entity.Property(e => e.Code).HasMaxLength(100);
             entity.Property(e => e.Enable).HasDefaultValue(true);
             entity.Property(e => e.InsertDate)
                 .HasDefaultValueSql("(getdate())")
@@ -101,10 +137,128 @@ public partial class SGCP_DbContext : DbContext
                 .HasForeignKey(d => d.CategoryId)
                 .HasConstraintName("FK_Components_Categories");
 
+            entity.HasOne(d => d.ComponentType).WithMany(p => p.Components)
+                .HasForeignKey(d => d.ComponentTypeId)
+                .HasConstraintName("FK_Components_ComponentTypeId");
+
             entity.HasOne(d => d.Unit).WithMany(p => p.Components)
                 .HasForeignKey(d => d.UnitId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Component__UnitI__797309D9");
+        });
+
+        modelBuilder.Entity<ComponentAttribute>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Componen__3214EC07ADEC6851");
+
+            entity.ToTable("ComponentAttributes", "Prod");
+
+            entity.Property(e => e.AttributeName).HasMaxLength(100);
+            entity.Property(e => e.AttributeValue).HasMaxLength(100);
+            entity.Property(e => e.Enable).HasDefaultValue(true);
+            entity.Property(e => e.InsertDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Component).WithMany(p => p.ComponentAttributes)
+                .HasForeignKey(d => d.ComponentId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ComponentAttributes_Components");
+        });
+
+        modelBuilder.Entity<ComponentPresentation>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Componen__3214EC07FA47771C");
+
+            entity.ToTable("ComponentPresentations", "Prod");
+
+            entity.Property(e => e.BaseUnitCost).HasColumnType("decimal(18, 4)");
+            entity.Property(e => e.Code).HasMaxLength(50);
+            entity.Property(e => e.Description).HasMaxLength(255);
+            entity.Property(e => e.Enable).HasDefaultValue(true);
+            entity.Property(e => e.InsertDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.LengthMeters).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.Measure).HasMaxLength(50);
+            entity.Property(e => e.Price).HasColumnType("decimal(18, 4)");
+            entity.Property(e => e.QuantityPerBase).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.WeightGrams).HasColumnType("decimal(10, 2)");
+
+            entity.HasOne(d => d.Component).WithMany(p => p.ComponentPresentations)
+                .HasForeignKey(d => d.ComponentId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Component__Compo__0FEC5ADD");
+
+            entity.HasOne(d => d.Unit).WithMany(p => p.ComponentPresentations)
+                .HasForeignKey(d => d.UnitId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Component__UnitI__10E07F16");
+        });
+
+        modelBuilder.Entity<ComponentProcess>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Componen__3214EC07B0953F01");
+
+            entity.ToTable("ComponentProcesses", "Prod");
+
+            entity.Property(e => e.CostPerUnit).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.Date)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Notes).HasMaxLength(255);
+            entity.Property(e => e.QuantityApplied).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.TotalCost)
+                .HasComputedColumnSql("([QuantityApplied]*[CostPerUnit])", true)
+                .HasColumnType("decimal(37, 4)");
+
+            entity.HasOne(d => d.Component).WithMany(p => p.ComponentProcesses)
+                .HasForeignKey(d => d.ComponentId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ComponentProcesses_Components");
+
+            entity.HasOne(d => d.ProcessType).WithMany(p => p.ComponentProcesses)
+                .HasForeignKey(d => d.ProcessTypeId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ComponentProcesses_ProcessTypes");
+
+            entity.HasOne(d => d.ScopeType).WithMany(p => p.ComponentProcesses)
+                .HasForeignKey(d => d.ScopeTypeId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ComponentProcesses_ScopeTypes");
+        });
+
+        modelBuilder.Entity<ComponentTreatment>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Componen__3214EC07FF28FBA9");
+
+            entity.ToTable("ComponentTreatments", "Prod");
+
+            entity.Property(e => e.Enable).HasDefaultValue(true);
+            entity.Property(e => e.ExtraCost).HasColumnType("decimal(18, 4)");
+            entity.Property(e => e.InsertDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+
+            entity.HasOne(d => d.Component).WithMany(p => p.ComponentTreatments)
+                .HasForeignKey(d => d.ComponentId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Component__Compo__056ECC6A");
+
+            entity.HasOne(d => d.TreatmentType).WithMany(p => p.ComponentTreatments)
+                .HasForeignKey(d => d.TreatmentTypeId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Component__Treat__0662F0A3");
+        });
+
+        modelBuilder.Entity<ComponentType>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Componen__3214EC07F09FD7A1");
+
+            entity.ToTable("ComponentTypes", "Cat");
+
+            entity.Property(e => e.Enable).HasDefaultValue(true);
+            entity.Property(e => e.Name).HasMaxLength(100);
         });
 
         modelBuilder.Entity<Currency>(entity =>
@@ -236,7 +390,13 @@ public partial class SGCP_DbContext : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.Name).HasMaxLength(100);
+            entity.Property(e => e.UnitId).HasDefaultValue(1L);
             entity.Property(e => e.UpdateDate).HasColumnType("datetime");
+
+            entity.HasOne(d => d.Unit).WithMany(p => p.LaborTypes)
+                .HasForeignKey(d => d.UnitId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_LaborTypes_Units");
         });
 
         modelBuilder.Entity<Location>(entity =>
@@ -262,6 +422,17 @@ public partial class SGCP_DbContext : DbContext
             entity.Property(e => e.Name).HasMaxLength(100);
         });
 
+        modelBuilder.Entity<ProcessType>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__ProcessT__3214EC07A76C9B76");
+
+            entity.ToTable("ProcessTypes", "Cat");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Enable).HasDefaultValue(true);
+            entity.Property(e => e.Name).HasMaxLength(100);
+        });
+
         modelBuilder.Entity<Product>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Products__3214EC07783DB36A");
@@ -278,6 +449,8 @@ public partial class SGCP_DbContext : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.Name).HasMaxLength(255);
+            entity.Property(e => e.Presentation).HasMaxLength(255);
+            entity.Property(e => e.TotalLength).HasColumnType("decimal(10, 2)");
             entity.Property(e => e.UpdateDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
@@ -286,6 +459,10 @@ public partial class SGCP_DbContext : DbContext
                 .HasForeignKey(d => d.CategoryId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Products__Catego__7D439ABD");
+
+            entity.HasOne(d => d.Unit).WithMany(p => p.Products)
+                .HasForeignKey(d => d.UnitId)
+                .HasConstraintName("FK_Products_UnitId");
         });
 
         modelBuilder.Entity<ProductComponent>(entity =>
@@ -319,6 +496,54 @@ public partial class SGCP_DbContext : DbContext
                 .HasConstraintName("FK_ProductComponents_Units");
         });
 
+        modelBuilder.Entity<ProductFixedCost>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__ProductF__3214EC07B034D5A5");
+
+            entity.ToTable("ProductFixedCosts", "Prod");
+
+            entity.Property(e => e.Amount).HasColumnType("decimal(18, 4)");
+            entity.Property(e => e.Enable).HasDefaultValue(true);
+            entity.Property(e => e.InsertDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Name).HasMaxLength(100);
+
+            entity.HasOne(d => d.Product).WithMany(p => p.ProductFixedCosts)
+                .HasForeignKey(d => d.ProductId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__ProductFi__Produ__1C5231C2");
+        });
+
+        modelBuilder.Entity<ProductPackaging>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__ProductP__3214EC07CFAD3EBC");
+
+            entity.ToTable("ProductPackaging", "Prod");
+
+            entity.Property(e => e.Cost).HasColumnType("decimal(18, 4)");
+            entity.Property(e => e.Enable).HasDefaultValue(true);
+            entity.Property(e => e.InsertDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Quantity).HasColumnType("decimal(10, 2)");
+
+            entity.HasOne(d => d.Component).WithMany(p => p.ProductPackagings)
+                .HasForeignKey(d => d.ComponentId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__ProductPa__Compo__1699586C");
+
+            entity.HasOne(d => d.Product).WithMany(p => p.ProductPackagings)
+                .HasForeignKey(d => d.ProductId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__ProductPa__Produ__15A53433");
+
+            entity.HasOne(d => d.Unit).WithMany(p => p.ProductPackagings)
+                .HasForeignKey(d => d.UnitId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__ProductPa__UnitI__178D7CA5");
+        });
+
         modelBuilder.Entity<ProductPrice>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__ProductP__3214EC07199E84BE");
@@ -329,9 +554,12 @@ public partial class SGCP_DbContext : DbContext
 
             entity.Property(e => e.Cost).HasColumnType("decimal(18, 4)");
             entity.Property(e => e.Enable).HasDefaultValue(true);
+            entity.Property(e => e.FixedCosts).HasColumnType("decimal(18, 4)");
             entity.Property(e => e.InsertDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
+            entity.Property(e => e.LaborCost).HasColumnType("decimal(18, 4)");
+            entity.Property(e => e.PackagingCost).HasColumnType("decimal(18, 4)");
             entity.Property(e => e.RetailRealPrice).HasColumnType("decimal(18, 4)");
             entity.Property(e => e.RetailSuggestedPrice).HasColumnType("decimal(18, 4)");
             entity.Property(e => e.UpdateDate)
@@ -442,6 +670,27 @@ public partial class SGCP_DbContext : DbContext
             entity.HasOne(d => d.Role).WithMany(p => p.RolePermissions)
                 .HasForeignKey(d => d.RoleId)
                 .HasConstraintName("FK__RolePermi__RoleI__6FB49575");
+        });
+
+        modelBuilder.Entity<ScopeType>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__ScopeTyp__3214EC0746906129");
+
+            entity.ToTable("ScopeTypes", "Cat");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Enable).HasDefaultValue(true);
+            entity.Property(e => e.Name).HasMaxLength(100);
+        });
+
+        modelBuilder.Entity<TreatmentType>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Treatmen__3214EC0777C18098");
+
+            entity.ToTable("TreatmentTypes", "Cat");
+
+            entity.Property(e => e.Enable).HasDefaultValue(true);
+            entity.Property(e => e.Name).HasMaxLength(100);
         });
 
         modelBuilder.Entity<Unit>(entity =>

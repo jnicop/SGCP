@@ -1,6 +1,6 @@
 ﻿namespace SGCP.DTOs.Unit
 {
-    public class UnitUpdateDto
+    public class UnitUpdateDto: UnitCreateDto
     {
         public string Name { get; set; }
         public string Symbol { get; set; }

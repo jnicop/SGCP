@@ -1,0 +1,29 @@
+.component-list-container {
+    padding: 24px;
+  }
+  
+  .component-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  
+    h2 {
+      margin: 0;
+    }
+  }
+  
+  table {
+    width: 100%;
+    margin-bottom: 16px;
+  }
+  
+  mat-paginator {
+    margin-top: 8px;
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: 8px;
+  }
+  

@@ -39,6 +39,7 @@ builder.Services.AddDbContext<SGCP_DbContext>(options =>
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IUnitService, UnitService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<ICatalogsService, CatalogsService>();
 builder.Services.AddScoped<ICurrencyService, CurrencyService>();
 builder.Services.AddScoped<ILocationService, LocationService>();
 builder.Services.AddScoped<IRegionService, RegionService>();
@@ -53,7 +54,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<ILaborTypeService, LaborTypeService>();
-
+builder.Services.AddScoped<IComponentBuilderService, ComponentBuilderService>();
 
 builder.Services.AddSingleton<IAuthorizationHandler, PermissionHandler>();
 builder.Services.AddHostedService<TokenCleanupService>();

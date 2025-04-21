@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ProductService } from '../services/product.service';
 import { ProductDto } from '../models/product.dto';
 import { MatDialog } from '@angular/material/dialog';
-import { ProductFormComponent } from '../product-form/product-form.component';
+// import { ProductFormComponent } from '../product-form/product-form.component';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { PaginationQueryDto } from 'core/dtos/PaginationQueryDto';
@@ -147,7 +147,7 @@ deleteProduct(id: number): void {
 
 
 createProduct(): void {
-  const dialogRef = this.dialog.open(ProductFormComponent, {
+  const dialogRef = this.dialog.open(ProductBuilderComponent, {
     width: '400px',
     data: null,
     enterAnimationDuration: '250ms',

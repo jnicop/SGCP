@@ -15,7 +15,7 @@ namespace SGCP.Controllers
             _unitService = unitService;
         }
 
-        [HttpGet]
+        [HttpGet("unit-types")]
         public async Task<IActionResult> GetAll() =>
             Ok(await _unitService.GetAllAsync());
 

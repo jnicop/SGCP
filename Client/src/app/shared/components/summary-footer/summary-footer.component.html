@@ -1,0 +1,13 @@
+<mat-card class="summary-footer">
+  <mat-card-content>
+    <div class="summary-footer-content">
+      <div *ngIf="showBase"><strong>Total sin tratamiento:</strong> {{ totalBase | customCurrency  }}</div>
+      <div *ngIf="showTreatment"><strong>Total tratamiento:</strong> {{ totalTreatment | customCurrency  }}</div>
+      <div *ngIf="showInsumos"><strong>Insumos:</strong> {{ insumos | customCurrency  }}</div>
+      <div *ngIf="showManoObra"><strong>Mano de Obra:</strong> {{ manoObra | customCurrency  }}</div>
+      <div *ngIf="showFinal"><strong>Total final:</strong> {{ totalFinal | customCurrency  }}</div>
+      <div *ngIf="showUnit"><strong>Unitario sin tratamiento:</strong> {{ unitBase | customCurrency  }}</div>
+      <div *ngIf="showUnitFinal"><strong>Unitario final:</strong> {{ unitFinal | customCurrency  }}</div>
+    </div>
+  </mat-card-content>
+</mat-card>

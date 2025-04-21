@@ -1,0 +1,79 @@
+<div class="component-list-container">
+    <div class="component-list-header">
+      <h2>Listado de Componentes</h2>
+      <button mat-raised-button color="primary" routerLink="/components/builder">
+        <mat-icon>add</mat-icon> Nuevo Componente
+      </button>
+    </div>
+  
+    <app-filter (filterChanged)="applyFilter($event)"></app-filter>
+  
+    <table mat-table [dataSource]="paginatedComponents" class="mat-elevation-z8">
+      <!-- Nombre -->
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef> Nombre </th>
+        <td mat-cell *matCellDef="let c"> {{ c.name }} </td>
+      </ng-container>
+        <!-- Descripcion -->
+        <ng-container matColumnDef="description">
+          <th mat-header-cell *matHeaderCellDef> Descripción </th>
+          <td mat-cell *matCellDef="let c"> {{ c.description }} </td>
+        </ng-container>
+      <!-- Código -->
+      <ng-container matColumnDef="code">
+        <th mat-header-cell *matHeaderCellDef> Código </th>
+        <td mat-cell *matCellDef="let c"> {{ c.code }} </td>
+      </ng-container>
+        <!-- Unit Symbol -->
+        <ng-container matColumnDef="unitSymbol">
+          <th mat-header-cell *matHeaderCellDef> Unidad </th>
+          <td mat-cell *matCellDef="let c"> {{ c.unitSymbol }} </td>
+        </ng-container>
+        <!-- Unit Cost -->
+      <ng-container matColumnDef="unitCost">
+        <th mat-header-cell *matHeaderCellDef> Costo unidad </th>
+        <td mat-cell *matCellDef="let c"> {{ c.unitCost |customCurrency  }} </td>
+      </ng-container>
+
+      <!-- Categoría -->
+      <ng-container matColumnDef="category">
+        <th mat-header-cell *matHeaderCellDef> Categoría </th>
+        <td mat-cell *matCellDef="let c"> {{ c.categoryName }} </td>
+      </ng-container>
+   <!-- Tipo de componente -->
+   <ng-container matColumnDef="componentTypeName">
+    <th mat-header-cell *matHeaderCellDef> Tipo </th>
+    <td mat-cell *matCellDef="let c"> {{ c.componentTypeName }} </td>
+  </ng-container>
+      <!-- Acciones -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef> Acciones </th>
+        <td mat-cell *matCellDef="let c">
+          <div class="action-buttons">
+            <button mat-icon-button [routerLink]="['/components/builder', c.id]" matTooltip="Editar">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="primary" (click)="duplicateComponent(c.id)" matTooltip="Duplicar componente">
+              <mat-icon>content_copy</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="deleteComponent(c.id)" matTooltip="Eliminar">
+              <mat-icon>delete</mat-icon>
+            </button>
+  
+            <button mat-icon-button (click)="toggleEnable(c)" [matTooltip]="c.enable ? 'Deshabilitar' : 'Habilitar'">
+              <mat-icon>{{ c.enable ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+          </div>
+        </td>
+      </ng-container>
+  
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  
+    <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+    <app-no-results *ngIf="paginatedComponents.length === 0 && !isLoading" message="No hay componentes disponibles." [showButton]="true" buttonText="Recargar" (buttonClick)="loadComponents()"></app-no-results>
+  
+    <mat-paginator [length]="totalItems" [pageSize]="pageSize" (page)="paginate($event)"></mat-paginator>
+  </div>
+  

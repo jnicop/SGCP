@@ -22,7 +22,9 @@
       "core/*": ["app/core/*"],
       "auth/*": ["app/auth/*"],
       "shared/*": ["app/shared/*"],
-      "modules/*": ["app/modules/*"]
+      "modules/*": ["app/modules/*"],
+      "environments/*": ["environments/*"],
+      "features/*": ["app/features/*"]
     }
   },
   "angularCompilerOptions": {

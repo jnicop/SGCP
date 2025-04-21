@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using SGCP.DTOs;
 using SGCP.DTOs.Component;
 using SGCP.Models;
 using SGCP.Services.Logger;
@@ -18,13 +19,53 @@ namespace SGCP.Services
             _mapper = mapper;
             _logger = logger;
         }
-
         public async Task<IEnumerable<ComponentDto>> GetAllAsync()
         {
             _logger.Info("Getting all components.");
             var components = await _context.Components.Include(p => p.Category).Where(c => c.Enable == true).ToListAsync();
             return _mapper.Map<IEnumerable<ComponentDto>>(components);
         }
+        public async Task<PagedResult<ComponentDto>> GetPagedAsync(PaginationQueryDto query, long? categoryId = null, int? componentTypeId = null)
+        {
+            var q = _context.Components
+                .Where(c => (query.Enable == null || c.Enable == query.Enable)
+                            && (string.IsNullOrEmpty(query.Search) || c.Name.Contains(query.Search))
+                            && (!categoryId.HasValue || c.CategoryId == categoryId.Value)
+                            && (!componentTypeId.HasValue || c.ComponentTypeId == componentTypeId.Value));
+
+            var total = await q.CountAsync();
+
+            var items = await q
+                .OrderBy(c => c.Name)
+                .Skip(query.PageIndex * query.PageSize)
+                .Take(query.PageSize)
+                .Select(c => new ComponentDto
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    Description = c.Description,
+                    Code = c.Code,
+                    UnitCost = c.UnitCost,
+                    Enable = c.Enable,
+                    CategoryId = c.CategoryId,
+                    CategoryName = c.Category != null ? c.Category.Name : null,
+                    ComponentTypeId = c.ComponentTypeId,
+                    ComponentTypeName = c.ComponentType != null ? c.ComponentType.Name : null,
+                    UnitId = c.UnitId,
+                    UnitName = c.Unit != null ? c.Unit.Name : null,
+                    UnitSymbol = c.Unit != null ? c.Unit.Symbol : null
+                })
+                .ToListAsync();
+
+            var mapped = _mapper.Map<IEnumerable<ComponentDto>>(items);
+
+            return new PagedResult<ComponentDto>
+            {
+                TotalItems = total,
+                Items = mapped
+            };
+        }
+
 
         public async Task<ComponentDto> GetByIdAsync(long id)
         {

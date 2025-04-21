@@ -17,14 +17,30 @@
         <textarea matInput formControlName="description"></textarea>
       </mat-form-field>
 
-      <mat-form-field appearance="fill">
+      <!-- <mat-form-field appearance="fill">
         <mat-label>Categoría *</mat-label>
         <mat-select formControlName="categoryId">
           <mat-option [value]="null" disabled>Seleccionar categoría</mat-option>
           <mat-option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</mat-option>
         </mat-select>
+      </mat-form-field> -->
+      <mat-form-field appearance="fill">
+        <mat-label>Seleccionar categoría</mat-label>
+        <input
+          type="text"
+          matInput
+          [formControl]="categoryControl"
+          [matAutocomplete]="auto" />
+      
+        <mat-autocomplete #auto="matAutocomplete"
+                          [displayWith]="displayCategory"
+                          (optionSelected)="selectCategory($event.option.value)">
+          <mat-option *ngFor="let category of filteredCategories | async" [value]="category">
+            {{ category.name }}
+          </mat-option>
+        </mat-autocomplete>
       </mat-form-field>
-
+      
       <div class="actions">
         <button mat-stroked-button color="warn" type="button" routerLink="/products">
           <mat-icon>cancel</mat-icon> Cancelar
@@ -60,7 +76,14 @@
         <mat-list>
           <mat-list-item *ngFor="let comp of components.controls; let i = index" [formGroupName]="i">
             <div class="item-content">
-              <span>{{ comp.get('componentName')?.value }} - {{ comp.get('quantity')?.value }}</span>
+              <span>
+                {{ comp.get('componentName')?.value }}
+                ({{ getComponentUnitAndCost(comp.get('componentId')?.value) }})
+                - {{ comp.get('quantity')?.value }}  {{ comp.get('unit')?.value }}
+                →
+                {{ getComponentTotalLineCost(comp.get('componentId')?.value, comp.get('quantity')?.value) }}
+              </span>
+              
               <button mat-icon-button color="warn" (click)="removeComponent(i)">
                 <mat-icon>delete</mat-icon>
               </button>
@@ -68,7 +91,17 @@
           </mat-list-item>
         </mat-list>
       </div>
-
+      <app-summary-footer
+      [showUnit]="false"
+      [showTreatment]="false"
+      [totalFinal]="productTotalCost"
+      [insumos]="componentTotalCost"
+      [manoObra]="laborTotalCost"
+      [showUnit]="false"
+      [showBase]="false"
+      [showUnitFinal]="false"
+      >
+    </app-summary-footer>
       <div class="actions">
         <button mat-stroked-button color="warn" type="button" (click)="prevStep()">Volver</button>
         <button mat-raised-button color="primary" type="button" (click)="nextStep()">Siguiente</button>
@@ -102,7 +135,12 @@
         <mat-list>
           <mat-list-item *ngFor="let labor of laborCosts.controls; let i = index" [formGroupName]="i">
             <div class="item-content">
-              <span>{{ labor.get('laborTypeName')?.value }} - {{ labor.get('hours')?.value }} h</span>
+              <span>
+                {{ labor.get('quantity')?.value }} h
+                →
+                {{ getLaborLineCostDetail(labor.get('laborTypeId')?.value, labor.get('quantity')?.value) }}
+              </span>
+              
               <button mat-icon-button color="warn" (click)="removeLaborCost(i)">
                 <mat-icon>delete</mat-icon>
               </button>
@@ -110,7 +148,18 @@
           </mat-list-item>
         </mat-list>
       </div>
-
+      <app-summary-footer
+      [showUnit]="false"
+      [showTreatment]="false"
+      [totalFinal]="productTotalCost"
+      [insumos]="componentTotalCost"
+      [manoObra]="laborTotalCost"
+      [showUnit]="false"
+      [showBase]="false"
+      [showUnitFinal]="false"
+      >
+    </app-summary-footer>
+    
       <div class="actions">
         <button mat-stroked-button color="warn" type="button" (click)="prevStep()">Volver</button>
         <button mat-raised-button color="primary" type="button" (click)="nextStep()">Siguiente</button>
@@ -132,26 +181,57 @@
       </mat-card>
 
       <mat-card class="summary-card">
-        <mat-card-title>Componentes</mat-card-title>
+        <mat-card-header>
+          <mat-icon mat-card-avatar color="accent">widgets</mat-icon>
+          <mat-card-title>Componentes utilizados</mat-card-title>
+        </mat-card-header>
         <mat-divider></mat-divider>
         <mat-card-content>
-          <mat-list>
-            <mat-list-item *ngFor="let comp of components.controls">
-              {{ comp.get('componentName')?.value }} - {{ comp.get('quantity')?.value }}
-            </mat-list-item>
-          </mat-list>
+          <div *ngIf="summaryComponents.length; else noComponents">
+            <div class="summary-item" *ngFor="let comp of summaryComponents">
+              <div class="line-title">{{ comp.componentName }} ({{ comp.quantity }} {{ comp.unit }})</div>
+              <div class="line-sub">
+                <span>Precio unitario: {{ getUnitCost(comp.componentId) }}</span> |
+                <span>Total: {{ getComponentTotalLineCost(comp.componentId, comp.quantity) }}</span>
+              </div>
+            </div>
+          </div>
+          <ng-template #noComponents>
+            <p class="text-muted">No se agregaron componentes.</p>
+          </ng-template>
         </mat-card-content>
       </mat-card>
-
+      
+      
       <mat-card class="summary-card">
-        <mat-card-title>Mano de obra</mat-card-title>
+        <mat-card-header>
+          <mat-icon mat-card-avatar color="accent">construction</mat-icon>
+          <mat-card-title>Mano de obra</mat-card-title>
+        </mat-card-header>
         <mat-divider></mat-divider>
         <mat-card-content>
-          <mat-list>
-            <mat-list-item *ngFor="let labor of laborCosts.controls">
-              {{ labor.get('laborTypeName')?.value }} - {{ labor.get('hours')?.value }} h
-            </mat-list-item>
-          </mat-list>
+          <div *ngIf="summaryLabor.length; else noLabor">
+            <div class="summary-item" *ngFor="let labor of summaryLabor">
+              <div class="line-title">{{ labor.laborTypeName }} ({{ labor.quantity }} h)</div>
+              <div class="line-sub">
+                <span>Costo por hora: {{ getHourlyCost(labor.laborTypeId) }}</span> |
+                <span>Total: {{ getLaborLineCostDetail(labor.laborTypeId, labor.quantity) }}</span>
+              </div>
+            </div>
+          </div>
+          <ng-template #noLabor>
+            <p class="text-muted">No se agregó mano de obra.</p>
+          </ng-template>
+        </mat-card-content>
+      </mat-card>
+      
+      <mat-card class="summary-card">
+        <mat-card-title>Resumen de Costos</mat-card-title>
+        <mat-divider></mat-divider>
+        <mat-card-content>
+          <p><strong>Total componentes:</strong> {{ componentTotalCost | customCurrency   }}</p>
+          <p><strong>Total mano de obra:</strong> {{ laborTotalCost | customCurrency  }}</p>
+          <p><strong>Total del producto:</strong> <span class="highlight">{{ productTotalCost | customCurrency }}</span></p>
         </mat-card-content>
       </mat-card>
 

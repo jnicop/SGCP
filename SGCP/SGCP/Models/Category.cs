@@ -9,8 +9,6 @@ public partial class Category
 
     public string? Name { get; set; }
 
-    public string Type { get; set; } = null!;
-
     public string? Description { get; set; }
 
     public DateTime? InsertDate { get; set; }
@@ -22,6 +20,10 @@ public partial class Category
     public long? UserUpdate { get; set; }
 
     public bool? Enable { get; set; }
+
+    public int CategoryTypeId { get; set; }
+
+    public virtual CategoryType CategoryType { get; set; } = null!;
 
     public virtual ICollection<Component> Components { get; set; } = new List<Component>();
 

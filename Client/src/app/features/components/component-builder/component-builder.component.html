@@ -1,0 +1,491 @@
+<div class="builder-wrapper">
+    <h2 class="title">Crear nuevo componente</h2>
+  
+    <form [formGroup]="builderForm" class="builder-form">
+      <!-- Paso 1: Datos básicos -->
+      <div *ngIf="step === 1" class="step">
+        <h3>Paso 1: Datos del componente</h3>
+  
+        <mat-form-field appearance="fill">
+          <mat-label>Nombre *</mat-label>
+          <input matInput formControlName="name" />
+        </mat-form-field>
+  
+        <mat-form-field appearance="fill">
+          <mat-label>Código</mat-label>
+          <input matInput formControlName="code" />
+        </mat-form-field>
+  
+        <mat-form-field appearance="fill">
+          <mat-label>Descripción</mat-label>
+          <textarea matInput formControlName="description"></textarea>
+        </mat-form-field>
+  
+
+        <mat-form-field appearance="fill">
+          <mat-label>Seleccionar categoría</mat-label>
+          <input
+            type="text"
+            matInput
+            [formControl]="categoryControl"
+            [matAutocomplete]="categoryAuto" />
+        
+          <mat-autocomplete #categoryAuto="matAutocomplete"
+                            [displayWith]="displayCategory"
+                            (optionSelected)="selectCategory($event.option.value)">
+            <mat-option *ngFor="let category of filteredCategories | async" [value]="category">
+              {{ category.name }}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+  
+
+        <mat-form-field appearance="fill">
+          <mat-label>Seleccionar tipo componente</mat-label>
+          <input
+            type="text"
+            matInput
+            [formControl]="componentTypesControl"
+            [matAutocomplete]="typeAuto" />
+        
+          <mat-autocomplete #typeAuto="matAutocomplete"
+                            [displayWith]="displayComponentType"
+                            (optionSelected)="selectComponentType($event.option.value)">
+            <mat-option *ngFor="let componentType of filteredComponentTypes | async" [value]="componentType">
+              {{ componentType.name }}
+            </mat-option>
+          </mat-autocomplete>
+          <mat-error *ngIf="builderForm.get('componentTypeId')?.hasError('required')">
+            El tipo de componente es obligatorio.
+          </mat-error>
+        </mat-form-field> 
+
+        <!-- <mat-form-field appearance="fill">
+          <mat-label>Tipo de Unidad *</mat-label>
+          <mat-select formControlName="unitId">
+            <mat-option [value]="null" disabled>Seleccionar tipo</mat-option>
+            <mat-option *ngFor="let type of unitTypes" [value]="type.id">
+              {{ type.name }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="builderForm.get('componentTypeId')?.hasError('required')">
+            El tipo de componente es obligatorio.
+          </mat-error>
+        </mat-form-field> -->
+
+        <mat-form-field appearance="fill">
+          <mat-label>Seleccionar unidad</mat-label>
+          <input
+            type="text"
+            matInput
+            [formControl]="unitTypesControl"
+            [matAutocomplete]="UnitAuto" />
+        
+          <mat-autocomplete #UnitAuto="matAutocomplete"
+                            [displayWith]="displayUnitType"
+                            (optionSelected)="selectUnitType($event.option.value)">
+            <mat-option *ngFor="let unitType of filteredUnitTypes | async" [value]="unitType">
+              {{ unitType.name }}
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+  
+        <div class="actions">
+          <button mat-stroked-button color="warn" routerLink="/components">Cancelar</button>
+          <button mat-raised-button color="primary" (click)="nextStep()">Siguiente</button>
+        </div>
+      </div>
+  
+      <!-- Paso 2: Presentaciones -->
+      <div *ngIf="step === 2" class="step">
+        <h3>Paso 2: Presentaciones</h3>
+      
+        <!-- Selector modo -->
+        <mat-radio-group [formControl]="presentationMode" class="inline-form">
+          <mat-radio-button value="unidad">Por unidad</mat-radio-button>
+          <mat-radio-button value="peso">Por peso</mat-radio-button>
+        </mat-radio-group>
+      
+        <!-- FORMULARIO DE CARGA (unidad o peso) -->
+        <div class="inline-form">
+      
+          <!-- 👇 Sección por unidad -->
+          <ng-container *ngIf="presentationMode.value === 'unidad'">
+            <form [formGroup]="presentationForm" class="inline-form" style="display: contents;">
+              <mat-form-field appearance="fill">
+                <mat-label>Descripción</mat-label>
+                <input matInput formControlName="description" />
+              </mat-form-field>
+      
+              <mat-form-field appearance="fill" class="small-field">
+                <mat-label>Cantidad</mat-label>
+                <input matInput type="number" formControlName="quantityPerBase" />
+              </mat-form-field>
+      
+              <mat-form-field appearance="fill" class="small-field">
+                <mat-label>Precio total</mat-label>
+                <input matInput type="number" formControlName="price" />
+              </mat-form-field>
+      
+              <mat-form-field appearance="fill">
+                <mat-label>Unidad</mat-label>
+                <mat-select formControlName="unitId">
+                  <mat-option *ngFor="let u of unitTypes" [value]="u.id">
+                    {{ u.name }} ({{ u.symbol }})
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </form>
+          </ng-container>
+      
+          <!-- 👇 Sección por peso -->
+          <ng-container *ngIf="presentationMode.value === 'peso'">
+            <form [formGroup]="weightForm" class="inline-form" style="display: contents;">
+              <mat-form-field appearance="fill" class="small-field">
+                <mat-label>Peso de la tira (g)</mat-label>
+                <input matInput type="number" formControlName="weightGrams" />
+              </mat-form-field>
+      
+              <mat-form-field appearance="fill" class="small-field">
+                <mat-label>Precio por gramo</mat-label>
+                <input matInput type="number" formControlName="pricePerGram" />
+              </mat-form-field>
+      
+              <mat-form-field appearance="fill" class="small-field">
+                <mat-label>Unidades por tira</mat-label>
+                <input matInput type="number" formControlName="unitsPerTira" />
+              </mat-form-field>
+            </form>
+          </ng-container>
+      
+          <!-- Botón común a ambos -->
+          <button mat-raised-button color="primary" class="add-btn" type="button"
+            (click)="presentationMode.value === 'unidad' ? addPresentationFromForm() : addPresentationFromWeight()">
+            <mat-icon class="icon-left">add</mat-icon> Agregar
+          </button>
+        </div>
+      
+        <!-- Vista previa solo si es por peso -->
+        <div class="preview-box" *ngIf="presentationMode.value === 'peso' && weightForm.valid">
+          <p><strong>Precio total estimado:</strong> {{ weightPreviewTotal | customCurrency }}</p>
+          <p><strong>Precio por unidad:</strong> {{ weightPreviewUnitPrice | customCurrency }}</p>
+        </div>
+      
+        <!-- Lista de presentaciones -->
+        <mat-card *ngIf="presentations.length > 0">
+          <mat-card-title>Presentaciones cargadas</mat-card-title>
+          <mat-divider></mat-divider>
+          <mat-card-content>
+            <div formArrayName="presentations">
+              <mat-list>
+                <mat-list-item *ngFor="let pres of presentations.controls; let i = index" [formGroupName]="i">
+                  {{ pres.get('description')?.value }} -
+                  {{ pres.get('quantityPerBase')?.value }} {{ getUnitSymbol(pres.get('unitId')?.value) }} →
+                  {{ getPresentationTotalFormatted(pres) }}
+      
+                  <button mat-icon-button color="warn" (click)="removeItem(presentations, i)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </mat-list-item>
+              </mat-list>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      
+        <app-summary-footer
+          [totalBase]="totalBasePrice"
+          [totalTreatment]="totalTreatmentCost"
+          [totalFinal]="totalFinalPrice"
+          [unitBase]="unitPriceWithoutTreatment"
+          [unitFinal]="unitFinalPrice"
+          [showInsumos]="false"
+          [showManoObra]="false">
+        </app-summary-footer>
+        <div class="actions">
+          <button mat-stroked-button color="warn" (click)="prevStep()">Volver</button>
+          <button mat-raised-button color="primary" (click)="nextStep()">Siguiente</button>
+        </div>
+      </div>
+
+      <!-- Paso 3: Atributos -->
+      <div *ngIf="step === 3" class="step">
+        <h3>Paso 3: Atributos</h3>
+
+        <div [formGroup]="attributeForm" class="inline-form">
+          <mat-form-field appearance="fill">
+            <mat-label>Nombre del atributo</mat-label>
+            <input matInput formControlName="attributeName" />
+          </mat-form-field>
+
+          <mat-form-field appearance="fill">
+            <mat-label>Valor</mat-label>
+            <input matInput formControlName="attributeValue" />
+          </mat-form-field>
+
+          <button mat-raised-button color="primary" class="add-btn" type="button" (click)="addAttributeFromForm()" [disabled]="attributeForm.invalid">
+            <mat-icon class="icon-left">add</mat-icon> Agregar
+          </button>
+        </div>
+
+        <mat-card *ngIf="attributes.length > 0">
+          <mat-card-title>Atributos cargados</mat-card-title>
+          <mat-divider></mat-divider>
+          <mat-card-content>
+            <mat-list>
+              <mat-list-item *ngFor="let attr of attributes.controls; let i = index">
+                {{ attr.get('attributeName')?.value }}: {{ attr.get('attributeValue')?.value }}
+                <button mat-icon-button color="warn" (click)="removeItem(attributes, i)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </mat-list-item>
+            </mat-list>
+          </mat-card-content>
+        </mat-card>
+
+        <app-summary-footer
+          [totalBase]="totalBasePrice"
+          [totalTreatment]="totalTreatmentCost"
+          [totalFinal]="totalFinalPrice"
+          [unitBase]="unitPriceWithoutTreatment"
+          [unitFinal]="unitFinalPrice"
+          [showInsumos]="false"
+          [showManoObra]="false">
+        </app-summary-footer>
+
+        <div class="actions">
+          <button mat-stroked-button color="warn" (click)="prevStep()">Volver</button>
+          <button mat-raised-button color="primary" (click)="nextStep()">Siguiente</button>
+        </div>
+      </div>
+
+      <!-- Paso 4: Tratamientos -->
+      <div *ngIf="step === 4" class="step">
+        <h3>Paso 4: Tratamientos aplicados</h3>
+
+        <div [formGroup]="treatmentForm" class="inline-form">
+          <mat-form-field appearance="fill">
+            <mat-label>Tipo de tratamiento</mat-label>
+            <mat-select formControlName="treatmentTypeId">
+              <mat-option *ngFor="let type of treatmentTypes" [value]="type.id">
+                {{ type.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="fill" class="small-field">
+            <mat-label>Costo extra</mat-label>
+            <input matInput type="number" formControlName="extraCost" />
+          </mat-form-field>
+
+          <button mat-raised-button color="primary" class="add-btn" type="button" (click)="addTreatmentFromForm()"
+            [disabled]="treatmentForm.invalid">
+            <mat-icon class="icon-left">add</mat-icon> Agregar
+          </button>
+        </div>
+
+        <!-- Lista de tratamientos cargados -->
+        <mat-card *ngIf="treatments.length > 0">
+          <mat-card-title>Tratamientos cargados</mat-card-title>
+          <mat-divider></mat-divider>
+          <mat-card-content>
+            <mat-list>
+              <mat-list-item *ngFor="let t of treatments.controls; let i = index">
+                {{ getTreatmentName(t.get('treatmentTypeId')?.value) }} – {{ t.get('extraCost')?.value | customCurrency }}
+                <button mat-icon-button color="warn" (click)="removeItem(treatments, i)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </mat-list-item>
+            </mat-list>
+          </mat-card-content>
+        </mat-card>
+
+        <app-summary-footer
+          [totalBase]="totalBasePrice"
+          [totalTreatment]="totalTreatmentCost"
+          [totalFinal]="totalFinalPrice"
+          [unitBase]="unitPriceWithoutTreatment"
+          [unitFinal]="unitFinalPrice"
+          [showInsumos]="false"
+          [showManoObra]="false">
+        </app-summary-footer>
+
+        <div class="actions">
+          <button mat-stroked-button color="warn" (click)="prevStep()">Volver</button>
+          <button mat-raised-button color="primary" (click)="nextStep()">Siguiente</button>
+        </div>
+      </div>
+
+      <!-- Paso 5: Procesos asociados -->
+      <div *ngIf="step === 5" class="step">
+        <h3>Paso 5: Procesos asociados</h3>
+
+        <div [formGroup]="processForm" class="inline-form">
+          <mat-form-field appearance="fill">
+            <mat-label>Tipo de proceso</mat-label>
+            <mat-select formControlName="processTypeId">
+              <mat-option *ngFor="let pt of processTypes" [value]="pt.id">
+                {{ pt.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="fill">
+            <mat-label>Alcance</mat-label>
+            <mat-select formControlName="scopeTypeId">
+              <mat-option *ngFor="let st of scopeTypes" [value]="st.id">
+                {{ st.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="fill" class="small-field">
+            <mat-label>Cantidad</mat-label>
+            <input matInput type="number" formControlName="quantityApplied" />
+          </mat-form-field>
+
+          <mat-form-field appearance="fill" class="small-field">
+            <mat-label>Costo unidad</mat-label>
+            <input matInput type="number" formControlName="costPerUnit" />
+          </mat-form-field>
+
+          <mat-form-field appearance="fill">
+            <mat-label>Fecha</mat-label>
+            <input matInput [matDatepicker]="pickerProc" formControlName="date" />
+            <mat-datepicker-toggle matSuffix [for]="pickerProc"></mat-datepicker-toggle>
+            <mat-datepicker #pickerProc></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field appearance="fill">
+            <mat-label>Notas</mat-label>
+            <input matInput formControlName="notes" />
+          </mat-form-field>
+
+          <button mat-raised-button color="primary" class="add-btn" type="button" (click)="addProcessFromForm()" [disabled]="processForm.invalid">
+            <mat-icon class="icon-left">add</mat-icon> Agregar
+          </button>
+        </div>
+
+        <mat-card *ngIf="processes.length > 0">
+          <mat-card-title>Procesos cargados</mat-card-title>
+          <mat-divider></mat-divider>
+          <mat-card-content>
+            <mat-list>
+              <mat-list-item *ngFor="let proc of processes.controls; let i = index">
+                {{ getProcessName(proc.get('processTypeId')?.value) }} –
+                {{ getScopeName(proc.get('scopeTypeId')?.value) }} –
+                {{ proc.get('quantityApplied')?.value }} x {{ proc.get('costPerUnit')?.value | customCurrency }} –
+                {{ proc.get('date')?.value | date:'dd/MM/yyyy' }}
+
+                <button mat-icon-button color="warn" (click)="removeItem(processes, i)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </mat-list-item>
+            </mat-list>
+          </mat-card-content>
+        </mat-card>
+
+        <app-summary-footer
+          [totalBase]="totalBasePrice"
+          [totalTreatment]="totalTreatmentCost"
+          [totalFinal]="totalFinalPrice"
+          [unitBase]="unitPriceWithoutTreatment"
+          [unitFinal]="unitFinalPrice"
+          [showInsumos]="false"
+          [showManoObra]="false">
+        </app-summary-footer>
+
+        <div class="actions">
+          <button mat-stroked-button color="warn" (click)="prevStep()">Volver</button>
+          <button mat-raised-button color="primary" (click)="nextStep()">Siguiente</button>
+        </div>
+      </div>
+
+
+      <!-- Paso 6: Resumen -->
+      <div *ngIf="step === 6" class="step">
+        <h3>Paso 6: Resumen final</h3>
+
+        <mat-card class="summary-card">
+          <mat-card-title>Datos básicos</mat-card-title>
+          <mat-divider></mat-divider>
+          <mat-card-content>
+            <p><strong>Nombre:</strong> {{ builderForm.value.name }}</p>
+            <p><strong>Código:</strong> {{ builderForm.value.code }}</p>
+            <p><strong>Descripción:</strong> {{ builderForm.value.description }}</p>
+            <p><strong>Categoría:</strong> {{ getCategoryName(builderForm.value.categoryId) }}</p>
+            <p><strong>Costo unitario:</strong> {{ totalFinalPrice | customCurrency }}</p>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="summary-card" *ngIf="presentations.length > 0">
+          <mat-card-title>Presentaciones</mat-card-title>
+          <mat-divider></mat-divider>
+          <mat-card-content>
+            <mat-list>
+              <mat-list-item *ngFor="let pres of presentations.controls">
+                {{ pres.value.description }} - ${{ pres.value.price }}
+              </mat-list-item>
+            </mat-list>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="summary-card" *ngIf="attributes.length > 0">
+          <mat-card-title>Atributos</mat-card-title>
+          <mat-divider></mat-divider>
+          <mat-card-content>
+            <mat-list>
+              <mat-list-item *ngFor="let attr of attributes.controls">
+                {{ attr.value.attributeName }}: {{ attr.value.attributeValue }}
+              </mat-list-item>
+            </mat-list>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="summary-card" *ngIf="treatments.length > 0">
+          <mat-card-title>Tratamientos</mat-card-title>
+          <mat-divider></mat-divider>
+          <mat-card-content>
+            <mat-list>
+              <mat-list-item *ngFor="let treat of treatments.controls">
+                {{ getTreatmentName(treat.value.treatmentTypeId) }} - Extra: {{ treat.value.extraCost | customCurrency }}
+              </mat-list-item>
+            </mat-list>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="summary-card" *ngIf="processes.length > 0">
+          <mat-card-title>Procesos</mat-card-title>
+          <mat-divider></mat-divider>
+          <mat-card-content>
+            <mat-list>
+              <mat-list-item *ngFor="let proc of processes.controls">
+                {{ getProcessName(proc.value.processTypeId) }} 
+                - {{ getScopeName(proc.value.scopeTypeId) }} 
+                - {{ proc.value.quantityApplied }} u × {{ formatCurrency(proc.value.costPerUnit) }}
+                = <strong>{{ formatCurrency(proc.value.quantityApplied * proc.value.costPerUnit) }}</strong>
+              </mat-list-item>
+            </mat-list>
+          </mat-card-content>
+        </mat-card>
+
+        <app-summary-footer
+          [totalBase]="totalBasePrice"
+          [totalTreatment]="totalTreatmentCost"
+          [totalFinal]="totalFinalPrice"
+          [unitBase]="unitPriceWithoutTreatment"
+          [unitFinal]="unitFinalPrice"
+          [showInsumos]="false"
+          [showManoObra]="false">
+        </app-summary-footer>
+
+        <div class="actions">
+          <button mat-stroked-button color="warn" (click)="prevStep()">Volver</button>
+          <button mat-raised-button color="primary" type="button" (click)="submitComponent()" [disabled]="isSaving">
+            <mat-icon>check</mat-icon> Confirmar y guardar
+          </button>
+        </div>
+      </div>
+
+    </form>
+  </div>
+  

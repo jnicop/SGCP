@@ -1,10 +1,13 @@
-﻿using SGCP.DTOs.Component;
+﻿using SGCP.DTOs;
+using SGCP.DTOs.Component;
 
 namespace SGCP.Services
 {
     public interface IComponentService
     {
         Task<IEnumerable<ComponentDto>> GetAllAsync();
+        Task<PagedResult<ComponentDto>> GetPagedAsync(PaginationQueryDto query, long? categoryId = null, int? componentTypeId = null);
+
         Task<ComponentDto> GetByIdAsync(long id);
         Task<ComponentDto> CreateAsync(ComponentCreateDto dto);
         Task<bool> UpdateAsync(long id, ComponentUpdateDto dto);

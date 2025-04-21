@@ -35,7 +35,19 @@ namespace SGCP.Controllers
                 return NotFound(new { ex.Message });
             }
         }
-
+        [HttpGet("category-type/{id}")]
+        [HasPermission("Categories.Read")]
+        public async Task<IActionResult> GetByType(int id)
+        {
+            try
+            {
+                return Ok(await _categoryService.GetByTypeAsync(id));
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { ex.Message });
+            }
+        }
         [HttpPost]
         [HasPermission("Categories.Create")]
         public async Task<IActionResult> Create([FromBody] CategoryCreateDto dto)

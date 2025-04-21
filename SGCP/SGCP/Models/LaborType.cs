@@ -19,5 +19,9 @@ public partial class LaborType
 
     public DateTime? UpdateDate { get; set; }
 
+    public long UnitId { get; set; }
+
     public virtual ICollection<LaborCost> LaborCosts { get; set; } = new List<LaborCost>();
+
+    public virtual Unit Unit { get; set; } = null!;
 }

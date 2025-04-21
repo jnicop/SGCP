@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { ProductDto } from '../models/product.dto';
 import { Observable } from 'rxjs';
-import { environment } from '../../../../../environments/environment';
+import { environment } from '../../../../environments/environment';
 import { PaginationQueryDto } from 'core/dtos/PaginationQueryDto';
 import { PagedResult } from 'core/dtos/PagedResult';
 import { ProductCreateDto } from '../models/ProductCreateDto';

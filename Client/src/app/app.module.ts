@@ -1,4 +1,6 @@
-import { NgModule } from '@angular/core';
+import { NgModule,LOCALE_ID  } from '@angular/core';
+import { registerLocaleData } from '@angular/common';
+import localeEsAr from '@angular/common/locales/es-AR';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
@@ -12,10 +14,9 @@ import { MainLayoutComponent } from './layout/main-layout/main-layout.component'
 import { NavbarComponent } from './layout/navbar/navbar.component';
 import { SidebarComponent } from './layout/sidebar/sidebar.component';
 
-// import { MaterialModule } from './shared/material.module';
 import { SharedModule } from './shared/shared.module';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations'; 
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
  declarations:[
@@ -23,7 +24,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
   LoginComponent,
   MainLayoutComponent,
   NavbarComponent,
-  SidebarComponent
+  SidebarComponent,
 ],
 imports: [
     BrowserModule,
@@ -38,8 +39,9 @@ imports: [
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
-      multi: true
-    }
+      multi: true,
+    },
+    { provide: LOCALE_ID, useValue: 'es-AR' }
   ],
   bootstrap: [AppComponent]
 })
